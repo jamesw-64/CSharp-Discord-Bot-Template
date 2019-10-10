@@ -16,7 +16,7 @@ namespace DiscordBot
         System.IO.StreamReader tokenInput;
         string tokenLoop;
         string token;
-        static string startTime = DateTime.Now.ToString("h-mm-ss tt");
+        static string startTime = DateTime.Now.ToString("HH-mm-ss");
 
         public static void Main(string[] args)
         => new Program().MainAsync().GetAwaiter().GetResult();
@@ -83,6 +83,7 @@ namespace DiscordBot
 
         private async Task MessageReceived(SocketMessage message)
         {
+            Log("Message Received! Contents: '" + message.Content + "' from " + message.Source + ": " + message.Author + " in channel: #" + message.Channel);
             if (message.Content == "!ping")
             {
                 await message.Channel.SendMessageAsync("Pong!");
@@ -92,29 +93,30 @@ namespace DiscordBot
         private Task LogMsg(LogMessage msg)
         {
             Console.WriteLine(msg.ToString());
-            System.IO.File.WriteAllText(@"DiscordBot.log", msg.ToString());
+            File.AppendAllText(@"DiscordBot_log_" + startTime + ".log", msg.ToString() + Environment.NewLine);
             return Task.CompletedTask;
         }
 
         static void CrashHandler(object sender, UnhandledExceptionEventArgs args)
         {
             Exception e = (Exception)args.ExceptionObject;
-            string msg = "Oops, the program has crash without being caught. Crash handler caught: " + e + "\nRuntime terminating? " + args.IsTerminating;
+            string msg = DateTime.Now.ToString("HH:mm:ss") + ": Oops, the program has crash without being caught. Crash handler caught: " + e + "\nRuntime terminating? " + args.IsTerminating;
             Console.WriteLine();
-            System.IO.File.WriteAllText(@"DiscordBot_log_" + startTime + ".log", msg);
+            File.AppendAllText(@"DiscordBot_log_" + startTime + ".log", msg + Environment.NewLine);
+            Environment.Exit(4);
         }
 
         private void Log(string msg)
         {
-            msg = DateTime.Now.ToString("h:mm:ss tt") + ": " + msg;
-            System.IO.File.WriteAllText(@"DiscordBot_log_" + startTime + ".log", msg);
+            msg = DateTime.Now.ToString("HH:mm:ss") + ": " + msg;
+            File.AppendAllText(@"DiscordBot_log_" + startTime + ".log", msg + Environment.NewLine);
             Console.WriteLine(msg);
         }
 
         private void Log(string msg, Boolean WriteLine)
         {
-            msg = DateTime.Now.ToString("h:mm:ss tt") + ": " + msg;
-            System.IO.File.WriteAllText(@"DiscordBot_log_" + startTime + ".log", msg);
+            msg = DateTime.Now.ToString("HH:mm:ss") + ": " + msg;
+            File.AppendAllText(@"DiscordBot_log_" + startTime + ".log", msg + Environment.NewLine);
             switch (WriteLine)
             {
                 case true:
