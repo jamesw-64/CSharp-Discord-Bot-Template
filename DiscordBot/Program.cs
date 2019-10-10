@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Net;
@@ -14,19 +16,48 @@ namespace DiscordBot
         System.IO.StreamReader tokenInput;
         string tokenLoop;
         string token;
+        static string startTime = DateTime.Now.ToString("h-mm-ss tt");
 
         public static void Main(string[] args)
         => new Program().MainAsync().GetAwaiter().GetResult();
 
         public async Task MainAsync()
         {
+            AppDomain currentDomain = AppDomain.CurrentDomain;
+            currentDomain.UnhandledException += new UnhandledExceptionEventHandler(CrashHandler);
+
+            Log("\n _              _       \n| \\o _ _ _ .__||_) __|_ \n|_/|_>(_(_)|(_||_)(_)|_ \n");
+
             try
             {
                 tokenInput = new System.IO.StreamReader(@"token.txt");
-            } catch (System.IO.FileNotFoundException Ex)
+            } catch (System.IO.FileNotFoundException)
             {
-                Console.WriteLine("We could not find your token.txt file. This is needed to communicate with your bot. Please place it in the /bin/netcoreapp3.0/ directory.");
-                Environment.Exit(1);
+                Log("We could not find your token.txt file. This is needed to communicate with your bot. Would you like to enter one now? (Y/N) ", false);
+                String input = Console.ReadLine();
+                input = input.ToUpper();
+                switch (input){
+                    case "Y":
+                        Log("Please input your token and press enter: ", false);
+                        token = Console.ReadLine();
+
+                        Log("Saving input...");
+                        System.IO.File.WriteAllText(@"token.txt", token);
+                        Log("token.txt saved to " + System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\token.txt");
+
+                        Log("Thank you. The program will now restart... (STOPCODE 3)");
+                        Process.Start(System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\DiscordBot.exe");
+                        Environment.Exit(3);
+                        break;
+                    case "N":
+                        Log("Program cannont operate without bot token. Exitiing... (STOPCODE 1)");
+                        Environment.Exit(1);
+                        break;
+                    default:
+                        Log("Did not understand input. Exiting... (STOPCODE 2)");
+                        Environment.Exit(2);
+                        break;
+                } 
             }
 
             while ((tokenLoop = tokenInput.ReadLine()) != null)
@@ -36,19 +67,12 @@ namespace DiscordBot
 
             tokenInput.Close();
 
-            Console.WriteLine("Welcome! Token is: " + token);
+            Console.WriteLine("Welcome! Token is: " + token + " (this line is not logged, so don't worry about submitting the log file if there is a crash)");
             _client = new DiscordSocketClient();
 
-            _client.Log += Log;
+            _client.Log += LogMsg;
 
-            // Remember to keep token private or to read it from an 
-            // external source! In this case, we are reading the token 
-            // from an environment variable. If you do not know how to set-up
-            // environment variables, you may find more information on the 
-            // Internet or by using other methods such as reading from 
-            // a configuration.
-            await _client.LoginAsync(TokenType.Bot,
-                token);
+            await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
 
             _client.MessageReceived += MessageReceived;
@@ -65,17 +89,41 @@ namespace DiscordBot
             }
         }
 
-        private Task Log(LogMessage msg)
+        private Task LogMsg(LogMessage msg)
         {
             Console.WriteLine(msg.ToString());
+            System.IO.File.WriteAllText(@"DiscordBot.log", msg.ToString());
             return Task.CompletedTask;
         }
 
-        //static void Main(string[] args)
-        //{
-        //TODO Create init menu to input tokens and store the output locally
-        //     to prevent token leaking
-        //Console.WriteLine("Hello World!");
-        //}
-    }
-}
+        static void CrashHandler(object sender, UnhandledExceptionEventArgs args)
+        {
+            Exception e = (Exception)args.ExceptionObject;
+            string msg = "Oops, the program has crash without being caught. Crash handler caught: " + e + "\nRuntime terminating? " + args.IsTerminating;
+            Console.WriteLine();
+            System.IO.File.WriteAllText(@"DiscordBot_log_" + startTime + ".log", msg);
+        }
+
+        private void Log(string msg)
+        {
+            msg = DateTime.Now.ToString("h:mm:ss tt") + ": " + msg;
+            System.IO.File.WriteAllText(@"DiscordBot_log_" + startTime + ".log", msg);
+            Console.WriteLine(msg);
+        }
+
+        private void Log(string msg, Boolean WriteLine)
+        {
+            msg = DateTime.Now.ToString("h:mm:ss tt") + ": " + msg;
+            System.IO.File.WriteAllText(@"DiscordBot_log_" + startTime + ".log", msg);
+            switch (WriteLine)
+            {
+                case true:
+                    Console.WriteLine(msg);
+                    break;
+                case false:
+                    Console.Write(msg);
+                    break;
+            }
+        }
+    } // end class
+} //end namespace
