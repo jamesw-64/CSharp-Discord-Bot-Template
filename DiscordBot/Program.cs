@@ -4,19 +4,24 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
-using Discord.Net;
+using DeepAI;
 using Discord.WebSocket;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace DiscordBot
 {
     class Program
     {
+        //create global variables 
         private DiscordSocketClient _client;
 
         System.IO.StreamReader tokenInput;
         string tokenLoop;
         string token;
         static string startTime = DateTime.Now.ToString("HH-mm-ss");
+
+        DeepAI_API api = new DeepAI_API(apiKey: "nope");
 
         public static void Main(string[] args)
         => new Program().MainAsync().GetAwaiter().GetResult();
@@ -88,12 +93,44 @@ namespace DiscordBot
             {
                 await message.Channel.SendMessageAsync("Pong!");
             }
+            if (message.Content.StartsWith("!generate"))
+            {
+                string msg = (message.Content).Replace("!generate ", "");
+                Log("Sending: '" + msg + "' to DeepAI");
+
+                await message.Channel.SendMessageAsync("Sending text to DeepAI and generating text, this may take a while and the bot will be unresponsive (maybe?) until task is completed. Please remember that the result of the generation does not reflect the views of any real people...");
+
+                await SendToAI(msg, message);
+            }
+            if (message.Content == "!end" && (message.Author).ToString == "GhostCode#6938")
+            {
+                await message.Channel.SendMessageAsync("Good night!");
+                Environment.Exit(0);
+            }
         }
 
         private Task LogMsg(LogMessage msg)
         {
             Console.WriteLine(msg.ToString());
             File.AppendAllText(@"DiscordBot_log_" + startTime + ".log", msg.ToString() + Environment.NewLine);
+            return Task.CompletedTask;
+        }
+
+        private Task SendToAI(string msg, SocketMessage message)
+        {
+            StandardApiResponse resp = api.callStandardApi("text-generator", new
+            {
+                text = msg,
+            });
+
+            var data = (JObject)JsonConvert.DeserializeObject(api.objectAsJsonString(resp));
+
+            System.IO.File.WriteAllText(@"deepai_output.txt", data["output"].Value<string>());
+
+            message.Channel.SendFileAsync(@"deepai_output.txt");
+
+            File.Delete(@"deepai_output.txt");
+
             return Task.CompletedTask;
         }
 
