@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 
-//File written (mostly) by James Wright. See the repo here: https://github.com/jamesw-64/DiscordBot
+//File written (mostly) by JASE. See the repo here: https://github.com/jamesw-64/CSharp-Discord-Bot-Template
 
 namespace DiscordBot
 {

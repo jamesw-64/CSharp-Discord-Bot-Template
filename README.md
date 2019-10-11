@@ -1,5 +1,7 @@
-# DiscordBot
+# C# Discord Bot Template
 [![Build Status](https://travis-ci.com/jamesw-64/DiscordBot.svg?branch=dev)](https://travis-ci.com/jamesw-64/DiscordBot)
+
+###### (Previous repo URL: https://github.com/jamesw-64/DiscordBot )
 
 A little attempt at making a Discord bot. Might use what I learn here to make something more useful
 
