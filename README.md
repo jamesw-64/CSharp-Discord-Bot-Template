@@ -1,15 +1,19 @@
 # C# Discord Bot Template
 [![Build Status](https://travis-ci.com/jamesw-64/DiscordBot.svg?branch=dev)](https://travis-ci.com/jamesw-64/DiscordBot)
 
-###### (Previous repo URL: https://github.com/jamesw-64/DiscordBot )
+###### (Notice: previous repo URL: https://github.com/jamesw-64/DiscordBot)
 
-A little attempt at making a Discord bot. Might use what I learn here to make something more useful
+A template for a C# Console Application Discord bot that makes use of the [Discord.Net Library](https://discord.foxbot.me/docs/index.html). Designed to run on a dedicated server, it comes with a 'Log' method that will print to the console while simultainiously saving the output to a log file found in the progam's executable directory. 
+
+Should be able to run and be developed on any system that can run [Mono](https://www.mono-project.com/) C# programs.
+
+Just clone straight from the directory and you're good to go!
 
 ## Stopcodes
-Here are the stopcodes that are used by the program when exiting prematurely:
+Here are the stopcodes that are used by the template when exiting prematurely:
  - Stopcode 1: Did not find token.txt, program exited
  - Stopcode 2: Invalid user input, program exited
  - Stopcode 3: token updated at user prompt, program restarted
  - Stopcode 4: General, unhandled error
 
-Please do not change the bot's compiled EXE file name, or any other file name, as doing so will cause issues. Bugs submitted with modified file names will not be investigated.
+You are free to disregard these stopcodes or change them. It's just a little something extra.
