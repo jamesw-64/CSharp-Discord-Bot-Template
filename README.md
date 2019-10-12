@@ -1,5 +1,5 @@
 # C# Discord Bot Template
-[![Build Status](https://travis-ci.com/jamesw-64/DiscordBot.svg?branch=dev)](https://travis-ci.com/jamesw-64/DiscordBot)
+[![Build Status](https://travis-ci.com/jamesw-64/CSharp-Discord-Bot-Template.svg?branch=master)](https://travis-ci.com/jamesw-64/DiscordBot)
 
 ###### (Notice: previous repo URL: https://github.com/jamesw-64/DiscordBot)
 
